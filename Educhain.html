@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<div class="app-header">
+    <h1>🎓 EduChain Myanmar</h1>
+    <p>Professional Digital Certificate System</p>
+    <small>Official Site: <strong>educhain-myanmar.netlify.app</strong></small>
+</div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduChain Myanmar - Live Certificate System</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#2E8B57">
+    <meta name="description" content="Myanmar's first blockchain-based certificate platform - Issue, verify, and manage digital certificates">
+    
+    <!-- Open Graph Meta Tags for Social Sharing -->
+    <meta property="og:title" content="EduChain Myanmar - Digital Certificate System">
+    <meta property="og:description" content="Issue and verify tamper-proof digital certificates in Myanmar">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%232E8B57'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white'>🎓</text></svg>">
+    
+    <style>
+        /* လက်ရှိ CSS အကုန်လုံး ဒီမှာထည့်ပါ */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Pyidaungsu', 'Myanmar3', sans-serif;
+            background: linear-gradient(135deg, #2E8B57, #1a535c);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 100%;
+            background: white;
+        }
+        
+        /* ... ကျန်တဲ့ CSS အကုန်လုံး ... */
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="status-bar" id="statusBar">
+            🌐 EduChain Myanmar - Live v1.0
+        </div>
+        
+        <div class="app-header">
+            <h1>🎓 EduChain Myanmar</h1>
+            <p>Live Certificate System - Deployed Successfully! 🚀</p>
+            <small>Share this app: <span id="shareUrl">Loading...</span></small>
+        </div>
+        
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="quickAction('လက်မှတ်ထုတ်')">လက်မှတ်ထုတ်</button>
+            <button class="quick-btn" onclick="quickAction('လက်မှတ်စစ်ဆေး')">လက်မှတ်စစ်ဆေး</button>
+            <button class="quick-btn" onclick="quickAction('လက်မှတ်ပြင်ဆင်ရန်')">လက်မှတ်ပြင်</button>
+            <button class="quick-btn" onclick="quickAction('စာရင်းကြည့်')">စာရင်းကြည့်</button>
+            <button class="quick-btn install-btn" onclick="showInstallPrompt()">📲 Install App</button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <strong>EduChain AI:</strong> မင်္ဂလာပါ! Live version ကိုစတင်အသုံးပြုပါပြီ။ ဤ app ကို online တွင်ရှိပြီး မည်သူမဆိုသုံးနိုင်ပါသည်။ "Install App" ခလုတ်နှိပ်ပြီး home screen မှာသိမ်းပါ။
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" class="message-input" id="userInput" 
+                   placeholder="စာရိုက်ထည့်ပါ..." 
+                   onkeypress="if(event.key=='Enter') sendMessage()">
+            <button class="send-button" onclick="sendMessage()">ပို့မည်</button>
+        </div>
+        
+        <!-- Deployment Footer -->
+        <div style="text-align: center; padding: 10px; background: #f8f9fa; border-top: 1px solid #ddd;">
+            <small>🚀 Powered by EduChain Myanmar | Live Version 1.0 | 
+                <span id="visitCount">Loading visits...</span>
+            </small>
+        </div>
+    </div>
+
+    <script>
+        // ==================== DEPLOYMENT ENHANCEMENTS ====================
+        
+        // Visit counter
+        function initVisitCounter() {
+            let visits = localStorage.getItem('educhain_visits') || 0;
+            visits = parseInt(visits) + 1;
+            localStorage.setItem('educhain_visits', visits);
+            document.getElementById('visitCount').textContent = `Visits: ${visits}`;
+        }
+        
+        // Share URL display
+        function initShareUrl() {
+            const currentUrl = window.location.href;
+            document.getElementById('shareUrl').textContent = currentUrl;
+            
+            // Create share button
+            const shareButton = document.createElement('button');
+            shareButton.textContent = '📤 Share Link';
+            shareButton.className = 'quick-btn';
+            shareButton.style.margin = '5px';
+            shareButton.onclick = () => {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'EduChain Myanmar - Digital Certificate System',
+                        text: 'Check out this amazing digital certificate platform for Myanmar!',
+                        url: currentUrl
+                    });
+                } else {
+                    navigator.clipboard.writeText(currentUrl);
+                    alert('✅ Link copied to clipboard!');
+                }
+            };
+            document.querySelector('.app-header').appendChild(shareButton);
+        }
+        
+        // Online status monitoring
+        function initOnlineStatus() {
+            window.addEventListener('online', () => {
+                updateStatus('🌐 Online - Live Server Connected');
+            });
+            
+            window.addEventListener('offline', () => {
+                updateStatus('🔴 Offline - Using Local Data');
+            });
+            
+            // Initial check
+            if (!navigator.onLine) {
+                updateStatus('⚡ Limited Mode - Working Offline');
+            }
+        }
+
+        // ==================== APP INITIALIZATION ====================
+        // ... (လက်ရှိ app initialization code အကုန်လုံး ဒီမှာထည့်ပါ) ...
+        
+        function initApp() {
+            certificateSystem = new CertificateSystem();
+            myanmarAI = new EnhancedMyanmarAI(certificateSystem);
+            setupPWA();
+            
+            // Deployment features
+            initVisitCounter();
+            initShareUrl(); 
+            initOnlineStatus();
+            
+            updateStatus(`🚀 Live - ${certificateSystem.certificates.length} certificates | Share: ${window.location.href}`);
+            console.log('🎓 EduChain Live Deployment Initialized!');
+        }
+
+        // ==================== ENHANCED PWA SETUP ====================
+        function setupPWA() {
+            if ('serviceWorker' in navigator) {
+                const swCode = `
+                    const CACHE_NAME = 'educhain-live-v1.0';
+                    const urlsToCache = [
+                        '/',
+                        '/index.html',
+                        'https://api.qrserver.com/v1/create-qr-code/'
+                    ];
+
+                    self.addEventListener('install', (event) => {
+                        event.waitUntil(
+                            caches.open(CACHE_NAME)
+                                .then((cache) => cache.addAll(urlsToCache))
+                        );
+                    });
+
+                    self.addEventListener('fetch', (event) => {
+                        event.respondWith(
+                            caches.match(event.request)
+                                .then((response) => response || fetch(event.request))
+                        );
+                    });
+                `;
+                
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                
+                navigator.serviceWorker.register(swUrl)
+                    .then(registration => console.log('✅ Production Service Worker Registered'))
+                    .catch(error => console.log('❌ Service Worker Failed:', error));
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                updateStatus('📱 App Install Available - Click Install Button');
+                <div style="text-align: center; padding: 10px; background: #f8f9fa;">
+    <small>
+        🌐 <strong>educhain-myanmar.netlify.app</strong> | 
+        📧 Contact: your-email@gmail.com |
+        📱 Share this app!
+    </small>
+</div>
+            });
+        }
+
+        // ==================== START APP ====================
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
