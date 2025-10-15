@@ -3,6 +3,247 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduChain Myanmar - Digital Certificate System v2.0</title>
+    
+    <!-- PWA Meta Tags with Version Control -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#2E8B57">
+    <meta name="description" content="Myanmar's first blockchain-based certificate platform v2.0 - Complete features with PDF export">
+    
+    <!-- PWA Manifest with Version -->
+    <link rel="manifest" href="manifest.json" id="appManifest">
+    
+    <!-- Force Cache Clear -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+        /* Your existing CSS styles here */
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Pyidaungsu', 'Myanmar3', sans-serif;
+            background: linear-gradient(135deg, #2E8B57, #1a535c);
+            min-height: 100vh;
+            padding: 0;
+            margin: 0;
+        }
+        
+        /* ... rest of your CSS ... */
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="status-bar" id="statusBar">
+            🚀 EduChain Myanmar - Complete v2.0 | All Features Included
+        </div>
+        
+        <div class="app-header">
+            <h1>🎓 EduChain Myanmar v2.0</h1>
+            <p>Complete Digital Certificate System with PDF Export</p>
+            <div class="deployment-info">
+                <strong>🌐 Version 2.0 - All Features: </strong>PDF Export • Custom Design • Photo Upload • Digital Signature
+                <br>
+                <button class="quick-btn" onclick="clearPwaCache()" style="margin: 5px;">🔄 Cache Clear</button>
+                <button class="quick-btn install-btn" onclick="showInstallPrompt()" style="margin: 5px;">📲 Install v2.0</button>
+            </div>
+        </div>
+        
+        <!-- Your existing HTML content -->
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="quickAction('လက်မှတ်ထုတ်')">လက်မှတ်ထုတ်</button>
+            <button class="quick-btn" onclick="quickAction('လက်မှတ်စစ်ဆေး')">လက်မှတ်စစ်ဆေး</button>
+            <button class="quick-btn correction-btn" onclick="quickAction('လက်မှတ်ပြင်ဆင်ရန်')">လက်မှတ်ပြင်</button>
+            <button class="quick-btn" onclick="quickAction('စာရင်းကြည့်')">စာရင်းကြည့်</button>
+            <button class="quick-btn" onclick="quickAction('ဒီဇိုင်းဆွဲ')">ဒီဇိုင်းဆွဲ</button>
+            <button class="quick-btn" onclick="quickAction('PDF ထုတ်')">PDF ထုတ်</button>
+            <button class="quick-btn" onclick="quickAction('အကူအညီ')">အကူအညီ</button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                <strong>EduChain AI v2.0:</strong> မင်္ဂလာပါ! Complete Digital Certificate System Version 2.0 ကိုစတင်အသုံးပြုပါပြီ။ PDF export, custom design, ဓာတ်ပုံနှင့် လက်မှတ်ထည့်သွင်းခြင်းစသည့် feature အားလုံးပါဝင်ပါသည်။
+                <br><br>
+                <strong>🔄 Cache ပြဿနာရှိပါက "Cache Clear" ခလုတ်ကိုနှိပ်ပါ</strong>
+            </div>
+        </div>
+        
+        <div class="input-container">
+            <input type="text" class="message-input" id="userInput" 
+                   placeholder="စာရိုက်ထည့်ပါ..." 
+                   onkeypress="if(event.key=='Enter') sendMessage()">
+            <button class="send-button" onclick="sendMessage()">ပို့မည်</button>
+        </div>
+        
+        <!-- System Footer -->
+        <div style="text-align: center; padding: 10px; background: #f8f9fa; border-top: 1px solid #ddd;">
+            <small>🚀 Powered by EduChain Myanmar | Version 2.0 | 
+                <span id="visitCount">Loading visits...</span> |
+                <span id="certCount">Loading certificates...</span> |
+                <span id="appVersion">v2.0.1</span>
+            </small>
+        </div>
+    </div>
+
+    <script>
+        // ==================== PWA VERSION CONTROL ====================
+        const APP_VERSION = '2.0.1';
+        const CACHE_NAME = 'educhain-v2-' + APP_VERSION;
+
+        // Service Worker Registration with Version Control
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                // Unregister old service workers first
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                    // Register new service worker
+                    navigator.serviceWorker.register('/sw.js?v=' + APP_VERSION)
+                        .then(function(registration) {
+                            console.log('SW registered: ', registration);
+                        })
+                        .catch(function(registrationError) {
+                            console.log('SW registration failed: ', registrationError);
+                        });
+                });
+            });
+        }
+
+        // Clear PWA Cache Function
+        function clearPwaCache() {
+            if ('caches' in window) {
+                caches.keys().then(function(cacheNames) {
+                    cacheNames.forEach(function(cacheName) {
+                        if (cacheName.includes('educhain')) {
+                            caches.delete(cacheName);
+                            console.log('Deleted cache: ', cacheName);
+                        }
+                    });
+                });
+            }
+            
+            // Clear localStorage if needed
+            // localStorage.clear();
+            
+            // Force reload
+            addMessage('✅ Cache များကိုရှင်းလင်းပြီးပါပြီ။ ကျေးဇူးပြု၍ app ကို restart လုပ်ပါ။', 'bot');
+            
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 2000);
+        }
+
+        // Update manifest version
+        function updateManifestVersion() {
+            const manifest = document.getElementById('appManifest');
+            if (manifest) {
+                manifest.href = 'manifest.json?v=' + APP_VERSION;
+            }
+        }
+
+        // Check for updates
+        function checkForUpdates() {
+            const lastVersion = localStorage.getItem('educhain_version');
+            if (lastVersion !== APP_VERSION) {
+                addMessage(`🔄 App Updated! Previous: ${lastVersion || '1.0'}, Current: ${APP_VERSION}`, 'bot');
+                localStorage.setItem('educhain_version', APP_VERSION);
+                clearPwaCache();
+            }
+        }
+
+        // Enhanced install prompt
+        function showInstallPrompt() {
+            if (window.deferredPrompt) {
+                window.deferredPrompt.prompt();
+                window.deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        addMessage('✅ EduChain v2.0 installed successfully!', 'bot');
+                    }
+                    window.deferredPrompt = null;
+                });
+            } else {
+                addMessage('📲 To install: Click "Add to Home Screen" in browser menu', 'bot');
+            }
+        }
+
+        // Before Install Prompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            window.deferredPrompt = e;
+        });
+
+        // ==================== INITIALIZATION ====================
+        window.addEventListener('load', function() {
+            // Version control
+            updateManifestVersion();
+            checkForUpdates();
+            document.getElementById('appVersion').textContent = APP_VERSION;
+            
+            // Update visit count
+            let visitCount = parseInt(localStorage.getItem('educhain_visits')) || 0;
+            visitCount++;
+            localStorage.setItem('educhain_visits', visitCount);
+            document.getElementById('visitCount').textContent = `Visits: ${visitCount}`;
+            
+            // Update certificate count
+            document.getElementById('certCount').textContent = `Certificates: ${certSystem.getAllCertificates().length}`;
+            
+            // Add sample data if empty
+            if (certSystem.getAllCertificates().length === 0) {
+                const sampleCerts = [
+                    {
+                        studentName: 'မေသဉ္ဇာကျော်',
+                        courseName: 'Blockchain Technology',
+                        institution: 'Yangon University'
+                    },
+                    {
+                        studentName: 'ကိုကိုမင်း', 
+                        courseName: 'Web Development',
+                        institution: 'MCF Programming Center'
+                    }
+                ];
+                
+                sampleCerts.forEach(data => {
+                    certSystem.issueNewCertificate(data);
+                });
+                
+                document.getElementById('certCount').textContent = `Certificates: ${certSystem.getAllCertificates().length}`;
+            }
+        });
+
+        // ==================== YOUR EXISTING CERTIFICATE SYSTEM CODE ====================
+        // [Your complete CertificateSystem class and other functions here]
+        // Make sure to keep all your existing certificate functionality
+
+        class CompleteCertificateSystem {
+            // ... your existing certificate system code ...
+        }
+
+        // Initialize your certificate system
+        let certSystem = new CompleteCertificateSystem();
+
+        // ... rest of your existing functions (addMessage, sendMessage, quickAction, etc.) ...
+    </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EduChain Myanmar - Digital Certificate System</title>
     
     <!-- PWA Meta Tags -->
